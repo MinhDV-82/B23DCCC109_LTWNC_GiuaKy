@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Button, Tag, Typography } from 'antd';
 import type { BookCardData } from '../types';
 import { getBookCover } from '../utils/bookCovers';
@@ -7,8 +7,8 @@ const { Title, Text, Paragraph } = Typography;
 
 export interface BookCardProps {
   book: BookCardData;
+  isBorrowed: boolean;
   borrowedCount?: number;
-  isBorrowed?: boolean;
   onBorrow: (id: string) => void;
   onReturn: (id: string) => void;
 }
@@ -20,14 +20,15 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export const BookCard: React.FC<BookCardProps> = React.memo(
-  ({ book, borrowedCount, isBorrowed, onBorrow, onReturn }) => {
+  ({ book, isBorrowed, borrowedCount, onBorrow, onReturn }) => {
     const isOutOfStock = book.availableCopies <= 0;
-    const initialCover = getBookCover(book.id, book.coverUrl);
-    const [imgSrc, setImgSrc] = useState(initialCover);
+    const isCurrentlyBorrowed = Boolean(isBorrowed || (borrowedCount && borrowedCount > 0));
+    const resolvedDefaultCover = getBookCover(book.id, book.coverUrl);
+    const [fallbackFailed, setFallbackFailed] = useState(false);
 
-    useEffect(() => {
-      setImgSrc(getBookCover(book.id, book.coverUrl));
-    }, [book.id, book.coverUrl]);
+    const imageSource = fallbackFailed
+      ? (book.coverUrl || resolvedDefaultCover)
+      : resolvedDefaultCover;
 
     return (
       <Card
@@ -39,12 +40,12 @@ export const BookCard: React.FC<BookCardProps> = React.memo(
         cover={
           <div style={{ position: 'relative', height: 220, overflow: 'hidden', background: '#f0f2f5' }}>
             <img
-              src={imgSrc}
+              src={imageSource}
               alt={book.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={() => {
-                if (book.coverUrl && imgSrc !== book.coverUrl) {
-                  setImgSrc(book.coverUrl);
+                if (!fallbackFailed && book.coverUrl) {
+                  setFallbackFailed(true);
                 }
               }}
             />
@@ -82,16 +83,16 @@ export const BookCard: React.FC<BookCardProps> = React.memo(
           </strong>
         </div>
 
-        {borrowedCount && borrowedCount > 0 ? (
+        {isCurrentlyBorrowed && (
           <div style={{ marginBottom: 14 }}>
             <Tag color="geekblue" style={{ fontWeight: 600 }}>
-              Đang mượn: {borrowedCount} cuốn
+              Đang mượn{borrowedCount && borrowedCount > 1 ? `: ${borrowedCount} cuốn` : ''}
             </Tag>
           </div>
-        ) : null}
+        )}
 
         <div style={{ marginTop: 'auto' }}>
-          {isBorrowed ? (
+          {isCurrentlyBorrowed ? (
             <Button
               danger
               block
@@ -104,6 +105,7 @@ export const BookCard: React.FC<BookCardProps> = React.memo(
               type="primary"
               block
               disabled={isOutOfStock}
+              aria-label={isOutOfStock ? 'Hết sách (Không thể mượn sách)' : 'Mượn sách'}
               onClick={() => onBorrow(book.id)}
             >
               {isOutOfStock ? 'Hết sách' : 'Mượn sách'}

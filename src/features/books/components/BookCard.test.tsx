@@ -81,5 +81,28 @@ describe('BookCard component', () => {
     const borrowBtn = screen.getByRole('button', { name: /hết sách/i });
     expect(borrowBtn).toBeDisabled();
   });
+
+  it('ở mục sách đang mượn hiển thị nút Trả sách và số bản đang mượn', async () => {
+    const user = userEvent.setup();
+    const handleBorrow = jest.fn();
+    const handleReturn = jest.fn();
+
+    render(
+      <BookCard
+        book={mockBook}
+        borrowedCount={2}
+        isBorrowed={true}
+        onBorrow={handleBorrow}
+        onReturn={handleReturn}
+      />
+    );
+
+    expect(screen.getByText('Đang mượn: 2 cuốn')).toBeInTheDocument();
+    const returnBtn = screen.getByRole('button', { name: /trả sách/i });
+    await user.click(returnBtn);
+
+    expect(handleReturn).toHaveBeenCalledTimes(1);
+    expect(handleReturn).toHaveBeenCalledWith('b1');
+  });
 });
 

@@ -6,4 +6,3 @@ export { useDebounce } from './hooks/useDebounce';
 export { fetchBooks } from './api/booksApi';
 export { seedBooks, BOOK_CATEGORIES } from './constants/books';
 export { getBookCover, famousBookCovers } from './utils/bookCovers';
-

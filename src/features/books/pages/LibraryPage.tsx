@@ -34,7 +34,9 @@ export function LibraryPage() {
 
   useEffect(() => {
     if (!items.length && !loading) {
-      dispatch(loadBooks());
+      const searchParams = new URLSearchParams(window.location.search);
+      const shouldFail = searchParams.get('fail') === 'true' || searchParams.get('error') === 'true';
+      dispatch(loadBooks(shouldFail));
     }
   }, [dispatch, items.length, loading]);
 
@@ -65,7 +67,11 @@ export function LibraryPage() {
   );
 
   const handleRetry = useCallback(() => {
-    dispatch(loadBooks());
+    dispatch(loadBooks(false));
+  }, [dispatch]);
+
+  const handleSimulateApiError = useCallback(() => {
+    dispatch(loadBooks(true));
   }, [dispatch]);
 
   const visible = useMemo(() => {
@@ -94,24 +100,17 @@ export function LibraryPage() {
           padding: '36px 32px',
           marginBottom: 32,
           border: '1px solid rgba(22, 119, 255, 0.15)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 24,
         }}
       >
-        <div>
-          <Text type="secondary" style={{ textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: 700, fontSize: 12 }}>
-            THƯ VIỆN KHOA CNTT
-          </Text>
-          <Title level={1} style={{ margin: '8px 0 6px 0', fontSize: '2.2rem' }}>
-            Tra cứu và Mượn trả sách
-          </Title>
-          <Paragraph type="secondary" style={{ margin: 0, fontSize: 15, maxWidth: 600 }}>
-            Hệ thống quản lý sách chuyên ngành thông minh, hỗ trợ sinh viên tra cứu tài liệu, theo dõi tình trạng sách và quản lý số lượng mượn tiện lợi.
-          </Paragraph>
-        </div>
+        <Text type="secondary" style={{ textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: 700, fontSize: 12 }}>
+          THƯ VIỆN KHOA CNTT
+        </Text>
+        <Title level={1} style={{ margin: '8px 0 6px 0', fontSize: '2.2rem' }}>
+          Tra cứu và Mượn trả sách
+        </Title>
+        <Paragraph type="secondary" style={{ margin: 0, fontSize: 15, maxWidth: 600 }}>
+          Hệ thống quản lý sách chuyên ngành thông minh, hỗ trợ sinh viên tra cứu tài liệu, theo dõi tình trạng sách và quản lý số lượng mượn tiện lợi.
+        </Paragraph>
       </div>
 
       {borrowedBooks.length > 0 && (
@@ -121,7 +120,7 @@ export function LibraryPage() {
           </Title>
           <Row gutter={[20, 20]}>
             {borrowedBooks.map((book) => {
-              const count = borrowedIds.filter((id) => id === book.id).length;
+              const count = borrowedIds.filter((bId) => bId === book.id).length;
               return (
                 <Col xs={24} sm={12} md={8} lg={6} key={`borrowed-${book.id}`}>
                   <BookCard
@@ -161,17 +160,27 @@ export function LibraryPage() {
           style={{ maxWidth: 380, width: '100%' }}
         />
 
-        <Radio.Group
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          buttonStyle="solid"
-        >
-          {BOOK_CATEGORIES.map((cat) => (
-            <Radio.Button key={cat} value={cat}>
-              {cat}
-            </Radio.Button>
-          ))}
-        </Radio.Group>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <Radio.Group
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            buttonStyle="solid"
+          >
+            {BOOK_CATEGORIES.map((cat) => (
+              <Radio.Button key={cat} value={cat}>
+                {cat}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
+
+          <Button
+            size="middle"
+            onClick={handleSimulateApiError}
+            title="Giả lập API thất bại để kiểm tra AC-03"
+          >
+            Giả lập lỗi API
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -191,7 +200,7 @@ export function LibraryPage() {
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <Spin size="large" />
-          <p style={{ marginTop: 16, color: '#8c8c8c', fontSize: 16, fontWeight: 500 }}>Đang tải...</p>
+          <p style={{ marginTop: 16, color: '#8c8c8c', fontSize: 16 }}>Đang tải...</p>
         </div>
       ) : (
         <div>
@@ -203,7 +212,7 @@ export function LibraryPage() {
 
           <Row gutter={[24, 24]}>
             {visible.map((book) => {
-              const count = borrowedIds.filter((id) => id === book.id).length;
+              const count = borrowedIds.filter((bId) => bId === book.id).length;
               return (
                 <Col xs={24} sm={12} md={8} lg={6} key={book.id}>
                   <BookCard
@@ -229,4 +238,3 @@ export function LibraryPage() {
     </div>
   );
 }
-

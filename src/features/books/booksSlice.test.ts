@@ -87,6 +87,20 @@ describe('booksSlice reducer', () => {
     expect(nextState.borrowedIds).not.toContain('b2');
   });
 
+  it('cho phép mượn một cuốn sách nhiều bản khi còn bản khả dụng', () => {
+    const stateFirstBorrow = booksReducer(baseState, borrowBook('b1'));
+    expect(stateFirstBorrow.borrowedIds).toEqual(['b1']);
+    expect(stateFirstBorrow.items.find((b) => b.id === 'b1')?.availableCopies).toBe(2);
+
+    const stateSecondBorrow = booksReducer(stateFirstBorrow, borrowBook('b1'));
+    expect(stateSecondBorrow.borrowedIds).toEqual(['b1', 'b1']);
+    expect(stateSecondBorrow.items.find((b) => b.id === 'b1')?.availableCopies).toBe(1);
+
+    const stateReturnOne = booksReducer(stateSecondBorrow, returnBook('b1'));
+    expect(stateReturnOne.borrowedIds).toEqual(['b1']);
+    expect(stateReturnOne.items.find((b) => b.id === 'b1')?.availableCopies).toBe(2);
+  });
+
   it('chặn mượn khi đã đủ 3 cuốn và thông báo cảnh báo', () => {
     const stateAtLimit: BooksState = {
       ...baseState,

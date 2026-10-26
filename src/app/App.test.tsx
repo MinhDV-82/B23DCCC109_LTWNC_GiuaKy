@@ -30,7 +30,7 @@ describe('Mini Library App E2E Flow', () => {
       </Provider>
     );
 
-    expect(screen.getByText(/Đang tải danh sách sách…/i)).toBeInTheDocument();
+    expect(screen.getByText(/Đang tải/i)).toBeInTheDocument();
 
     await act(async () => {
       jest.advanceTimersByTime(500);

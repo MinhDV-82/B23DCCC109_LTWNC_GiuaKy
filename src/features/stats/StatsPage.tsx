@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useMemo } from 'react';
-import { Card, Row, Col, Statistic, Progress, List, Button, Typography, Space, Tag } from 'antd';
-import { useAppSelector } from '../../app/hooks';
+import { useMemo, useEffect } from 'react';
+import { Card, Row, Col, Statistic, Progress, List, Button, Typography, Space, Tag, Spin } from 'antd';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { loadBooks } from '../books/booksSlice';
 import type { Category, CategoryStatsMap } from '../books/types';
 
 const { Title, Paragraph, Text } = Typography;
@@ -14,7 +15,14 @@ const CATEGORY_COLORS: Record<Category, string> = {
 };
 
 export default function StatsPage() {
-  const { items, borrowedIds } = useAppSelector((state) => state.books);
+  const dispatch = useAppDispatch();
+  const { items, borrowedIds, loading } = useAppSelector((state) => state.books);
+
+  useEffect(() => {
+    if (!items.length && !loading) {
+      dispatch(loadBooks());
+    }
+  }, [dispatch, items.length, loading]);
 
   const categoryStats: CategoryStatsMap = useMemo(() => {
     const stats: CategoryStatsMap = {
@@ -37,6 +45,14 @@ export default function StatsPage() {
   const borrowedBooks = useMemo(() => {
     return items.filter((book) => borrowedIds.includes(book.id));
   }, [items, borrowedIds]);
+
+  if (loading && !items.length) {
+    return (
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 24px', textAlign: 'center' }}>
+        <Spin size="large" tip="Đang tải dữ liệu thống kê..." />
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: '32px 24px' }}>
@@ -113,7 +129,7 @@ export default function StatsPage() {
               itemLayout="horizontal"
               dataSource={borrowedBooks}
               renderItem={(book) => (
-                <List.Item>
+                <List.Item key={book.id}>
                   <List.Item.Meta
                     title={book.title}
                     description={`Tác giả: ${book.author} · Năm XB: ${book.publishYear}`}
@@ -136,4 +152,3 @@ export default function StatsPage() {
     </div>
   );
 }
-

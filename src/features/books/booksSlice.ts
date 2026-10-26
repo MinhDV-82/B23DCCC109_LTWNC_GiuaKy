@@ -13,7 +13,7 @@ export interface BooksState {
 const initialState: BooksState = {
   items: [],
   borrowedIds: [],
-  loading: true,
+  loading: false,
   error: null,
   warning: null,
 };
@@ -48,10 +48,14 @@ const booksSlice = createSlice({
     },
     returnBook(state, action: PayloadAction<string>) {
       const bookId = action.payload;
+      const index = state.borrowedIds.indexOf(bookId);
+      if (index === -1) {
+        return;
+      }
       const book = state.items.find((item) => item.id === bookId);
-      if (book && state.borrowedIds.includes(bookId)) {
+      if (book) {
         book.availableCopies += 1;
-        state.borrowedIds = state.borrowedIds.filter((id) => id !== bookId);
+        state.borrowedIds.splice(index, 1);
         state.warning = null;
       }
     },

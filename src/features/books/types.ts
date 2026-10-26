@@ -36,3 +36,6 @@ export type BookCardData = Pick<
 
 export type ReadonlyBook = Readonly<Book>;
 
+export type NewBookPayload = Omit<Book, 'id'>;
+
+export type BookFilterOptions = Partial<Pick<Book, 'category' | 'author' | 'publishYear'>>;
