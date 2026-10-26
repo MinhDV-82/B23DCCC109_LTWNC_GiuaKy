@@ -1,0 +1,42 @@
+{
+  "name": "ltw-nc-giuaky",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "typecheck": "tsc -b",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.3.4",
+    "@reduxjs/toolkit": "^2.13.0",
+    "antd": "^6.6.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-redux": "^9.3.0",
+    "react-router-dom": "^7.18.4",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
+    "oxlint": "^1.88.0",
+    "ts-jest": "^29.4.15",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4"
+  }
+}

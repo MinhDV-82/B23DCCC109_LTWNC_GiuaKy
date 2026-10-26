@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.book-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.book-card:hover {
+  transform: translateY(-4px);
+}
+
+.book-card .ant-card-cover img {
+  transition: transform 0.3s ease;
+}
+
+.book-card:hover .ant-card-cover img {
+  transform: scale(1.04);
+}
